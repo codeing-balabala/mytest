@@ -1,3 +1,0 @@
-/home/will/momenta/project/test/build/CMakeFiles/rebuild_cache.dir
-/home/will/momenta/project/test/build/CMakeFiles/my_test.dir
-/home/will/momenta/project/test/build/CMakeFiles/edit_cache.dir
