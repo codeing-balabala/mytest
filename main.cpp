@@ -1,6 +1,12 @@
 #include <stdio.h>
+#include <chrono>
+#include <condition_variable>
+#include <functional>
+#include <future>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <random>
 #include <string>
 #include <thread>
 #include <vector>
@@ -9,14 +15,101 @@
 #include <producer.hpp>
 #include <queue.hpp>
 
-// #define THREAD_NUMBER 2
-// void test_thread(void) {
-//   std::vector<std::thread> threads;
-//   for (int i = 0; i < THREAD_NUMBER; i++) {
-//     threads.push_back(std::thread(
-//         [](int i) { std::cout << "start thread:" << i << std::endl; }));
-//   }
-// }
+std::mutex mtx;
+std::condition_variable cv;  // 全局条件变量.
+bool ready = false;
+
+void test_future(void) {
+  std::shared_future<int> f;
+  f = std::async([]() {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return 10;
+  });
+
+  std::cout << f.get() << std::endl;
+  std::cout << f.get() << std::endl;
+}
+
+#define THREAD_NUMBER 1
+void test_thread(void) {
+  int number = 0;
+  std::vector<std::thread> threads;
+  for (int i = 0; i < THREAD_NUMBER; i++) {
+    threads.push_back(std::thread(
+        [](int id, int &number) {
+          std::cout << "thread" << id << "start" << std::endl;
+          std::unique_lock<std::mutex> lck(mtx);
+          if (lck.owns_lock())
+            std::cout << '*' << std::endl;
+          else
+            std::cout << 'x' << std::endl;
+
+          // std::thread temp = std::thread{[]() {
+          //   std::unique_lock<std::mutex> lck(mtx);
+          //   // cv.notify_one();
+          //   std::this_thread::sleep_for(std::chrono::seconds(1));
+          //   while (1) {
+          //     if (lck.owns_lock()) {
+          //       lck.unlock();
+          //     } else if (lck.try_lock()) {
+          //       // cv.notify_one();
+          //       // lck.lock();
+          //       // std::cout << "get mtx" << std::endl;
+          //     }
+          //   }
+          // }};
+
+          while (true) {
+            std::cout << "thread" << id << ":wait" << std::endl;
+            // cv.wait(lck, []() { return ready; });  // 当前线程被阻塞,
+            // cv.wait_for(lck, std::chrono::seconds(1));  // 当前线程被阻塞,
+            // cv.wait(lck);  // 当前线程被阻塞,
+            std::cout << "thread" << id << ":get" << std::endl;
+            number++;
+            std::cout << "thread" << id << "number:" << number << std::endl;
+            ready = false;
+            cv.notify_all();
+            std::cout << "thread" << id << ":notify_one" << std::endl;
+            if (number >= 10) {
+              std::cout << "thread" << id << "number:" << number << ",return"
+                        << std::endl;
+              // temp.join();
+              return;
+            }
+            cv.wait_for(lck, std::chrono::seconds(1));  // 当前线程被阻塞,
+          }
+        },
+        i, std::ref(number)));
+  }
+
+  std::function<void(void)> go = []() {
+    std::unique_lock<std::mutex> lck(mtx);
+    ready = true;
+
+    cv.notify_one();  // 唤醒所有线程
+  };
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  go();
+  // std::cout << "notify thread" << std::endl;
+
+  for (auto &&t : threads) {
+    if (t.joinable()) {
+      t.join();
+    }
+  }
+}
+
+void test_random(void) {
+  std::vector<int> vi;
+  int temp1 = 0;
+  std::default_random_engine e(12);
+  std::uniform_int_distribution<> u(0, 100);
+  for (std::size_t i = 0; i < 10; i++) {
+    temp1 = u(e);
+    vi.push_back(temp1);
+    std::cout << "temp1:" << temp1 << std::endl;
+  }
+}
 
 class Family : public std::enable_shared_from_this<Family> {
  public:
@@ -42,6 +135,9 @@ class Family : public std::enable_shared_from_this<Family> {
 void test_shared_ptr(void) {
   std::shared_ptr<Family> kate;
   std::shared_ptr<Family> lily;
+
+  bool flag = static_cast<bool>(kate);
+  std::cout << std::boolalpha << flag << std::endl;
 
   Family *dad0 = new Family{"father"};
   // std::unique_ptr<Family> dad1(dad0);
@@ -360,8 +456,10 @@ int main(void) {
   std::cout << "hello world!" << std::endl;
 
   // test_ref();
-  test_shared_ptr();
+  // test_shared_ptr();
   // test_thread();
+  test_future();
+  // test_random();
   // test_pub_sub();
 
   return 0;
