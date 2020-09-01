@@ -15,6 +15,8 @@
 #include <producer.hpp>
 #include <queue.hpp>
 
+#include <list.hpp>
+
 std::mutex mtx;
 std::condition_variable cv;  // 全局条件变量.
 bool ready = false;
@@ -452,15 +454,30 @@ void test_pub_sub(void) {
   }
 }
 
+void test_list(void) {
+  Single_List<int> list = Single_List<int>{};
+  for (int i = 0; i < 10; i++) {
+    list.insert(i);
+  }
+
+  list.remove(5);
+  list.remove(list.find(6));
+
+  std::cout << "size:" << list.size() << std::endl;
+  list.print();
+}
+
 int main(void) {
   std::cout << "hello world!" << std::endl;
 
   // test_ref();
   // test_shared_ptr();
   // test_thread();
-  test_future();
+  // test_future();
   // test_random();
   // test_pub_sub();
+
+  test_list();
 
   return 0;
 }
