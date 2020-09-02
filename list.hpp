@@ -90,16 +90,12 @@ class Single_List {
   }
 
   List_Node* find(const T& v) {
-    if (header->value == v) {
-      return header;
-    }
-
     List_Node* node = header;
-    while (node->next != nullptr) {
-      node = node->next;
+    while (node != nullptr) {
       if (node->value == v) {
         return node;
       }
+      node = node->next;
     }
 
     std::cout << "not found " << v << std::endl;
