@@ -455,14 +455,16 @@ void test_pub_sub(void) {
 }
 
 void test_single_list(void) {
-  Single_List<int> list = Single_List<int>{0};
-  for (int i = 0; i < 10; i++) {
-    list.insert(i);
-  }
+  Single_List<int> list = Single_List<int>{6};
+  // for (int i = 0; i < 10; i++) {
+  //   list.insert(i);
+  // }
 
   list.remove(5);
-  list.remove(list.find(0));
+  list.remove(list.find(3));
 
+  list.show();
+  list.overturn();
   list.show();
 }
 

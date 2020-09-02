@@ -130,6 +130,17 @@ class Single_List {
     }
   }
 
+  void overturn(void) {
+    List_Node* node = header;
+    List_Node* temp = nullptr;
+    while (node != nullptr) {
+      header = node;
+      node = node->next;
+      header->next = temp;
+      temp = header;
+    }
+  }
+
  private:
   List_Node* header;
   int number;
