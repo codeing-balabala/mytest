@@ -137,6 +137,21 @@ class Single_List {
     }
   }
 
+  bool has_circle(void) {
+    List_Node* slower = header;
+    List_Node* faster = header;
+    while ((slower != nullptr) && (faster != nullptr) &&
+           (faster->next != nullptr)) {
+      slower = slower->next;
+      faster = faster->next->next;
+      if (slower == faster) {
+        std::cout << "has circle" << std::endl;
+        return true;
+      }
+    }
+    return false;
+  }
+
  private:
   List_Node* header;
   int number;

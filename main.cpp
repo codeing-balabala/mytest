@@ -466,6 +466,11 @@ void test_single_list(void) {
   list.show();
   list.overturn();
   list.show();
+
+  list.find(7)->next = list.header;
+
+  std::cout << "has circle:" << std::boolalpha << list.has_circle()
+            << std::endl;
 }
 
 int main(void) {
