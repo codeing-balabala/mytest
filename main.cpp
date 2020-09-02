@@ -454,7 +454,7 @@ void test_pub_sub(void) {
   }
 }
 
-void test_list(void) {
+void test_single_list(void) {
   Single_List<int> list = Single_List<int>{5};
   for (int i = 0; i < 10; i++) {
     list.insert(i);
@@ -476,7 +476,7 @@ int main(void) {
   // test_random();
   // test_pub_sub();
 
-  test_list();
+  test_single_list();
 
   return 0;
 }
