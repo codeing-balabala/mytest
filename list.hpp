@@ -75,6 +75,7 @@ class Single_List {
     List_Node* node = header;
     while (node->next != nullptr) {
       if (node->next == n) {
+        std::cout << "found " << static_cast<const void*>(n) << std::endl;
         List_Node* temp = node->next;
         node->next = temp->next;
         delete temp;
@@ -84,7 +85,7 @@ class Single_List {
       node = node->next;
     }
 
-    std::cout << "not found " << n << std::endl;
+    std::cout << "not found " << static_cast<const void*>(n) << std::endl;
     return false;
   }
 
@@ -112,6 +113,7 @@ class Single_List {
   void show() {
     List_Node* node = header;
     std::cout << "size:" << number << std::endl;
+    std::cout << "value:" << node->value << std::endl;
     while (node->next != nullptr) {
       node = node->next;
       std::cout << "value:" << node->value << std::endl;
