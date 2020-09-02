@@ -455,7 +455,7 @@ void test_pub_sub(void) {
 }
 
 void test_list(void) {
-  Single_List<int> list = Single_List<int>{};
+  Single_List<int> list = Single_List<int>{5};
   for (int i = 0; i < 10; i++) {
     list.insert(i);
   }
@@ -463,8 +463,7 @@ void test_list(void) {
   list.remove(5);
   list.remove(list.find(6));
 
-  std::cout << "size:" << list.size() << std::endl;
-  list.print();
+  list.show();
 }
 
 int main(void) {

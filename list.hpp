@@ -1,113 +1,117 @@
 #include <iostream>
 
 template <typename T>
-struct List_Node {
-  List_Node(const T& v) : value(v), next(nullptr) {
-    std::cout << "construct List_Node." << std::endl;
-  }
-
-  void insert(const T& v) {
-    List_Node* node = this;
-    while (node->next != nullptr) {
-      node = node->next;
-    }
-    node->next = new List_Node(v);
-  }
-
-  List_Node* find(const T& v) {
-    List_Node* node = this;
-    while (node->next != nullptr) {
-      if (node->next->value == v) {
-        return node->next;
-      }
-      node = node->next;
-    }
-    return nullptr;
-  }
-
-  bool remove(const T& v) {
-    List_Node* node = this;
-    while (node->next != nullptr) {
-      if (node->next->value == v) {
-        List_Node* temp = node->next;
-        node->next = node->next->next;
-        delete temp;
-        return true;
-      }
-      node = node->next;
-    }
-    return false;
-  }
-
-  bool remove(const List_Node* n) {
-    List_Node* node = this;
-    while (node->next != nullptr) {
-      if (node->next->value == n->value) {
-        List_Node* temp = node->next;
-        node->next = node->next->next;
-        delete temp;
-        return true;
-      }
-      node = node->next;
-    }
-    return false;
-  }
-
-  T value;
-  List_Node* next;
-};
-
-template <typename T>
 class Single_List {
  public:
-  Single_List() {
+  Single_List() : number{0}, header{nullptr} {
     std::cout << "construct Single_List." << std::endl;
-    header = nullptr;
-    number = 0;
   }
 
   Single_List(const T& v) {
     std::cout << "construct Single_List with value." << std::endl;
-
-    header = new List_Node<T>(v);
-    header->insert(v);
+    header = new List_Node(v);
     number = 1;
   }
 
-  void insert(const T& value) {
-    if (isEmpty()) {
-      header = new List_Node<T>(value);
-    } else {
-      header->insert(value);
+ public:
+  struct List_Node {
+    List_Node(const T& v) : value{v}, next{nullptr} {
+      std::cout << "construct List_Node." << std::endl;
     }
+
+    T value;
+    List_Node* next;
+  };
+
+ public:
+  void insert(const T& v) {
+    if (isEmpty()) {
+      header = new List_Node(v);
+    } else {
+      List_Node* node = header;
+      while (node->next != nullptr) {
+        node = node->next;
+      }
+      node->next = new List_Node(v);
+    }
+
     number++;
   }
 
-  void remove(const T& value) {
-    if (header->remove(value)) {
+  bool remove(const T& v) {
+    if (header->value == v) {
+      List_Node* temp = header;
+      header = temp->next;
+      delete temp;
       number--;
-    } else {
-      std::cout << "not found " << value << std::endl;
+      return true;
     }
+
+    List_Node* node = header;
+    while (node->next != nullptr) {
+      if (node->next->value == v) {
+        List_Node* temp = node->next;
+        node->next = temp->next;
+        delete temp;
+        number--;
+        return true;
+      }
+      node = node->next;
+    }
+
+    std::cout << "not found " << v << std::endl;
+    return false;
   }
 
-  void remove(const List_Node<T>* node) {
-    if (header->remove(node)) {
+  bool remove(const List_Node* n) {
+    if (header == n) {
+      List_Node* temp = header;
+      header = header->next;
+      delete temp;
       number--;
+      return true;
     }
+
+    List_Node* node = header;
+    while (node->next != nullptr) {
+      if (node->next == n) {
+        List_Node* temp = node->next;
+        node->next = temp->next;
+        delete temp;
+        number--;
+        return true;
+      }
+      node = node->next;
+    }
+
+    std::cout << "not found " << n << std::endl;
+    return false;
   }
 
-  List_Node<T>* find(const T& value) {
-    List_Node<T>* node = header->find(value);
-    return node;
+  List_Node* find(const T& v) {
+    if (header->value == v) {
+      return header;
+    }
+
+    List_Node* node = header;
+    while (node->next != nullptr) {
+      node = node->next;
+      if (node->value == v) {
+        return node;
+      }
+    }
+
+    std::cout << "not found " << v << std::endl;
+    return nullptr;
   }
 
   bool isEmpty(void) { return number == 0; }
 
   int size(void) { return number; }
 
-  void print() {
-    List_Node<T>* node = header;
+  void show() {
+    List_Node* node = header;
+    std::cout << "size:" << number << std::endl;
     while (node->next != nullptr) {
       node = node->next;
       std::cout << "value:" << node->value << std::endl;
@@ -115,8 +119,8 @@ class Single_List {
   }
 
   void earse(void) {
-    List_Node<T>* node = header;
-    List_Node<T>* node_del = header;
+    List_Node* node = header;
+    List_Node* node_del = header;
     while (node != nullptr) {
       node_del = node;
       node = node->next;
@@ -125,7 +129,7 @@ class Single_List {
   }
 
  private:
-  List_Node<T>* header;
+  List_Node* header;
   int number;
 
  public:
